@@ -16,11 +16,18 @@ sudo mkdir -p $APP_DIR
 
 # Sync files to app folder
 echo "Syncing files to app folder"
-rsync -av --exclude 'venv' --exclude 'env' . $APP_DIR
+rsync -av --exclude 'venv' . $APP_DIR
 
 # Navigate to the app directory
 cd $APP_DIR
-sudo mv env .env
+
+# Move .env file if it exists
+if [ -f env ]; then
+    echo "Moving .env file"
+    sudo mv env .env
+else
+    echo ".env file not found, skipping"
+fi
 
 # Changing ownership to the current user
 echo "Changing ownership to the current user"
