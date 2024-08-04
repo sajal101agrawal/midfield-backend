@@ -40,8 +40,13 @@ echo "Creating and activating virtual environment"
 python3 -m venv $VENV_DIR
 source $VENV_DIR/bin/activate
 
-# Install application dependencies from requirements.txt
-echo "Installing application dependencies from requirements.txt"
+# Install conflicting packages separately with --no-deps
+echo "Installing conflicting packages separately with --no-deps"
+pip install guardrails-ai==0.5.2 --no-deps
+pip install langchain-openai==0.0.3 --no-deps
+
+# Install remaining dependencies
+echo "Installing remaining dependencies"
 pip install -r requirements.txt
 
 # Install Gunicorn
