@@ -35,6 +35,10 @@ sudo apt-get update
 echo "Installing python, pip, and venv"
 sudo apt-get install -y python3 python3-pip python3-venv
 
+# Install system dependencies for building some Python packages
+echo "Installing system dependencies"
+sudo apt-get install -y pkg-config cmake
+
 # Create and activate a virtual environment
 echo "Creating and activating virtual environment"
 python3 -m venv $VENV_DIR
