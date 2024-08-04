@@ -120,7 +120,6 @@ guardrails hub install hub://guardrails/lowercase
 guardrails hub install hub://guardrails/has_url
 guardrails hub install hub://guardrails/exclude_sql_predicates
 guardrails hub install hub://guardrails/endpoint_is_reachable
-guardrails hub install hub://guardrails/contains_string
 guardrails hub install hub://guardrails/toxic_language
 guardrails hub install hub://guardrails/similar_to_document
 guardrails hub install hub://guardrails/saliency_check
