@@ -57,10 +57,17 @@ source $VENV_DIR/bin/activate
 echo "Installing application dependencies from requirements.txt"
 pip install -r requirements.txt
 
-# Configure Guardrails API key
+# Configure Guardrails API key using expect
 echo "Configuring Guardrails API key"
-guardrails configure <<EOF
-$GUARDRAILS_API_KEY
+expect << EOF
+spawn guardrails configure
+expect "Enable anonymous metrics reporting? \[Y/n\]:"
+send "n\r"
+expect "Do you wish to use remote inferencing? \[Y/n\]:"
+send "n\r"
+expect "API Key:"
+send "$GUARDRAILS_API_KEY\r"
+expect eof
 EOF
 
 # Install Guardrails hub packages
