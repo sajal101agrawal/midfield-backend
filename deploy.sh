@@ -33,7 +33,7 @@ fi
 echo "Changing ownership to the current user"
 sudo chown -R $USER:$USER $APP_DIR
 
-# Install Python, pip, and venv if not already installed
+# Install Python, pip, and venv if not already installed.
 sudo apt-get update
 echo "Installing python, pip, and venv"
 sudo apt-get install -y python3 python3-pip python3-venv
