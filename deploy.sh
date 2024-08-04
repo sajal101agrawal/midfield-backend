@@ -16,7 +16,7 @@ sudo mkdir -p $APP_DIR
 
 # Sync files to app folder
 echo "Syncing files to app folder"
-rsync -av --exclude 'venv' . $APP_DIR
+sudo rsync -av --exclude 'venv' . $APP_DIR
 
 # Navigate to the app directory
 cd $APP_DIR
@@ -33,7 +33,7 @@ fi
 echo "Changing ownership to the current user"
 sudo chown -R $USER:$USER $APP_DIR
 
-# Install Python, pip, and venv if not already installed.
+# Install Python, pip, and venv if not already installed
 sudo apt-get update
 echo "Installing python, pip, and venv"
 sudo apt-get install -y python3 python3-pip python3-venv
@@ -45,7 +45,7 @@ sudo apt-get install -y pkg-config cmake
 # Create and activate a virtual environment
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virtual environment"
-    python3 -m venv $VENV_DIR
+    sudo python3 -m venv $VENV_DIR
 fi
 
 echo "Activating virtual environment"
@@ -98,7 +98,7 @@ sudo pkill gunicorn || true
 # Activate the virtual environment and start Gunicorn with the Django application
 echo "Starting Gunicorn"
 source $VENV_DIR/bin/activate
-$VENV_DIR/bin/gunicorn --workers 3 --bind unix:$GUNICORN_SOCKET midfield_backend.wsgi:application --daemon --user www-data --group www-data --log-file $GUNICORN_LOG --access-logfile $GUNICORN_ACCESS_LOG
+sudo $VENV_DIR/bin/gunicorn --workers 3 --bind unix:$GUNICORN_SOCKET midfield_backend.wsgi:application --daemon --user www-data --group www-data --log-file $GUNICORN_LOG --access-logfile $GUNICORN_ACCESS_LOG
 
 # Set permissions
 echo "Setting permissions"
