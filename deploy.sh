@@ -99,7 +99,7 @@ sudo pkill gunicorn || true
 # Activate the virtual environment and start Gunicorn with the Django application
 echo "Starting Gunicorn"
 source $VENV_DIR/bin/activate
-sudo $VENV_DIR/bin/gunicorn --workers 3 --bind unix:$GUNICORN_SOCKET midfield_backend.wsgi:application --daemon --user www-data --group www-data --log-file $GUNICORN_LOG --access-logfile $GUNICORN_ACCESS_LOG
+sudo $VENV_DIR/bin/gunicorn --workers 3 --bind unix:$GUNICORN_SOCKET midfield.wsgi:application --daemon --user www-data --group www-data --log-file $GUNICORN_LOG --access-logfile $GUNICORN_ACCESS_LOG
 
 # Set permissions
 echo "Setting permissions"
