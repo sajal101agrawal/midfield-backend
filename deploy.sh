@@ -80,7 +80,6 @@ guardrails hub install hub://arize-ai/dataset_embeddings_guardrails
 guardrails hub install hub://scb-10x/correct_language
 guardrails hub install hub://guardrails/detect_prompt_injection
 guardrails hub install hub://aryn/extractive_summary
-guardrails hub install hub://brainlogic/high_quality_translation
 guardrails hub install hub://guardrails/nsfw_text
 guardrails hub install hub://guardrails/provenance_embeddings
 guardrails hub install hub://guardrails/qa_relevance_llm_eval
