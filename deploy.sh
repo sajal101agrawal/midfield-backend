@@ -46,6 +46,7 @@ sudo apt-get install -y pkg-config cmake
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virtual environment"
     sudo python3 -m venv $VENV_DIR
+    sudo chown -R $USER:$USER $VENV_DIR
 fi
 
 echo "Activating virtual environment"
