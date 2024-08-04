@@ -92,7 +92,7 @@ langcodes==3.4.0
 langsmith==0.1.96
 language_data==1.2.0
 lightning-utilities==0.11.6
-litellm==1.42.11
+litellm==1.40.8
 llama-cloud==0.0.11
 llama-index==0.10.59
 llama-index-agent-openai==0.2.9
@@ -214,7 +214,7 @@ tenacity==8.5.0
 thefuzz==0.22.1
 thinc==8.2.5
 threadpoolctl==3.5.0
-tiktoken==0.7.0
+tiktoken==0.5.2
 tldextract==5.1.2
 tokenizers==0.19.1
 torch==2.4.0
