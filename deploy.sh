@@ -43,6 +43,10 @@ sudo apt-get install -y python3 python3-pip python3-venv
 echo "Installing system dependencies"
 sudo apt-get install -y pkg-config cmake
 
+# Install expect
+echo "Installing expect"
+sudo apt-get install -y expect
+
 # Create and activate a virtual environment
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virtual environment"
