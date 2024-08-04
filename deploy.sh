@@ -6,6 +6,10 @@ set -e
 echo "Creating app folder"
 sudo mkdir -p /var/www/midfield-backend
 
+# Remove existing files in the app folder
+echo "Removing existing files in app folder"
+sudo rm -rf /var/www/midfield-backend/*
+
 # Moving files to app folder
 echo "Moving files to app folder"
 sudo mv * /var/www/midfield-backend
