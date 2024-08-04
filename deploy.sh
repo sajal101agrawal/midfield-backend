@@ -99,10 +99,24 @@ sudo pkill gunicorn || true
 # Activate the virtual environment and start Gunicorn with the Django application
 echo "Starting Gunicorn"
 source $VENV_DIR/bin/activate
+
+# Export PYTHONPATH to ensure the project module is found
+export PYTHONPATH=$PYTHONPATH:$APP_DIR
+
 sudo $VENV_DIR/bin/gunicorn --workers 3 --bind unix:$GUNICORN_SOCKET midfield.wsgi:application --daemon --user www-data --group www-data --log-file $GUNICORN_LOG --access-logfile $GUNICORN_ACCESS_LOG
 
 # Set permissions
 echo "Setting permissions"
 sudo chown -R www-data:www-data $APP_DIR
+
+# Display status for debugging
+echo "Checking Gunicorn status"
+ps aux | grep gunicorn
+
+echo "Checking Gunicorn log"
+sudo cat $GUNICORN_LOG
+
+echo "Checking Nginx error log"
+sudo cat /var/log/nginx/error.log
 
 echo "Deployment complete 🚀"
