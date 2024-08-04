@@ -19,7 +19,23 @@ class PromptView(APIView):
     def post(self, request, *args, **kwargs):
         apikey = request.data.get('apikey')
         prompt = request.data.get('prompt')
-        checks = request.data.get('checks', [])
+
+        checks = [
+        # {
+        #     "type": "regex_match",
+        #     "parameters": {
+        #         "regex": "\\(?\\d{3}\\)?-? *\\d{3}-? *-?\\d{4}"
+        #     }
+        # },
+        {
+            "type": "toxic_language",
+            "parameters": {}
+        },
+                {
+            "type": "mentions_drugs",
+            "parameters": {}
+        }
+    ]
 
         if not apikey:
             return Response({'error': 'API KEY is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -29,8 +45,6 @@ class PromptView(APIView):
         if not prompt:
             return Response({'error': 'Prompt is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not checks:
-            return Response({'error': 'Checks are required'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Map of check types to validator classes
         validators = {
