@@ -14,13 +14,9 @@ NGINX_CONF="/etc/nginx/sites-available/midfield-backend"
 echo "Creating app folder"
 sudo mkdir -p $APP_DIR
 
-# Remove existing files in the app folder
-echo "Removing existing files in app folder"
-sudo rm -rf $APP_DIR/*
-
-# Move files to app folder
-echo "Moving files to app folder"
-sudo cp -r . $APP_DIR
+# Sync files to app folder
+echo "Syncing files to app folder"
+rsync -av --exclude 'venv' --exclude 'env' . $APP_DIR
 
 # Navigate to the app directory
 cd $APP_DIR
@@ -40,8 +36,12 @@ echo "Installing system dependencies"
 sudo apt-get install -y pkg-config cmake
 
 # Create and activate a virtual environment
-echo "Creating and activating virtual environment"
-python3 -m venv $VENV_DIR
+if [ ! -d "$VENV_DIR" ]; then
+    echo "Creating virtual environment"
+    python3 -m venv $VENV_DIR
+fi
+
+echo "Activating virtual environment"
 source $VENV_DIR/bin/activate
 
 # Install application dependencies from requirements.txt
