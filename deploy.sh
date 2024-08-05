@@ -74,63 +74,74 @@ send "$GUARDRAILS_API_KEY\r"
 expect eof
 EOF
 
+# Function to install Guardrails hub package if not already installed
+install_guardrails_hub_package() {
+    PACKAGE=$1
+    if ! guardrails hub list | grep -q "$PACKAGE"; then
+        echo "Installing $PACKAGE"
+        guardrails hub install $PACKAGE
+    else
+        echo "$PACKAGE is already installed"
+    fi
+}
+
 # Install Guardrails hub packages
 echo "Installing Guardrails hub packages"
-guardrails hub install hub://arize-ai/dataset_embeddings_guardrails
-guardrails hub install hub://scb-10x/correct_language
-guardrails hub install hub://guardrails/detect_prompt_injection
-guardrails hub install hub://aryn/extractive_summary
-guardrails hub install hub://guardrails/nsfw_text
-guardrails hub install hub://guardrails/provenance_embeddings
-guardrails hub install hub://guardrails/qa_relevance_llm_eval
-guardrails hub install hub://tryolabs/restricttotopic
-guardrails hub install hub://guardrails/secrets_present
-guardrails hub install hub://guardrails/similar_to_previous_values
-guardrails hub install hub://guardrails/wiki_provenance
-guardrails hub install hub://hyparam/csv_validator
-guardrails hub install hub://guardrails/ends_with
-guardrails hub install hub://cartesia/financial_tone
-guardrails hub install hub://guardrails/llm_critic
-guardrails hub install hub://cartesia/mentions_drugs
-guardrails hub install hub://guardrails/politeness_check
-guardrails hub install hub://guardrails/reading_level
-guardrails hub install hub://guardrails/redundant_sentences
-guardrails hub install hub://guardrails/response_evaluator
-guardrails hub install hub://guardrails/sensitive_topics
-guardrails hub install hub://guardrails/two_words
-guardrails hub install hub://guardrails/uppercase
-guardrails hub install hub://guardrails/valid_choices
-guardrails hub install hub://guardrails/valid_length
-guardrails hub install hub://reflex/valid_python
-guardrails hub install hub://guardrails/valid_sql
-guardrails hub install hub://guardrails/web_sanitization
-guardrails hub install hub://guardrails/valid_url
-guardrails hub install hub://guardrails/valid_range
-guardrails hub install hub://guardrails/valid_open_api_spec
-guardrails hub install hub://guardrails/valid_json
-guardrails hub install hub://guardrails/valid_address
-guardrails hub install hub://guardrails/unusual_prompt
-guardrails hub install hub://numbersstation/sql_column_presence
-guardrails hub install hub://guardrails/responsiveness_check
-guardrails hub install hub://guardrails/regex_match
-guardrails hub install hub://guardrails/reading_time
-guardrails hub install hub://cartesia/quotes_price
-guardrails hub install hub://guardrails/one_line
-guardrails hub install hub://guardrails/lowercase
-guardrails hub install hub://guardrails/has_url
-guardrails hub install hub://guardrails/exclude_sql_predicates
-guardrails hub install hub://guardrails/endpoint_is_reachable
-guardrails hub install hub://guardrails/toxic_language
-guardrails hub install hub://guardrails/similar_to_document
-guardrails hub install hub://guardrails/saliency_check
-guardrails hub install hub://arize-ai/relevancy_evaluator
-guardrails hub install hub://guardrails/provenance_llm
-guardrails hub install hub://guardrails/profanity_free
-guardrails hub install hub://guardrails/logic_check
-guardrails hub install hub://guardrails/gibberish_text
-guardrails hub install hub://guardrails/extracted_summary_sentences_match
-guardrails hub install hub://guardrails/detect_pii
-guardrails hub install hub://guardrails/competitor_check
+install_guardrails_hub_package hub://arize-ai/dataset_embeddings_guardrails
+install_guardrails_hub_package hub://scb-10x/correct_language
+install_guardrails_hub_package hub://guardrails/detect_prompt_injection
+install_guardrails_hub_package hub://aryn/extractive_summary
+install_guardrails_hub_package hub://guardrails/nsfw_text
+install_guardrails_hub_package hub://guardrails/provenance_embeddings
+install_guardrails_hub_package hub://guardrails/qa_relevance_llm_eval
+install_guardrails_hub_package hub://tryolabs/restricttotopic
+install_guardrails_hub_package hub://guardrails/secrets_present
+install_guardrails_hub_package hub://guardrails/similar_to_previous_values
+install_guardrails_hub_package hub://guardrails/wiki_provenance
+install_guardrails_hub_package hub://hyparam/csv_validator
+install_guardrails_hub_package hub://guardrails/ends_with
+install_guardrails_hub_package hub://cartesia/financial_tone
+install_guardrails_hub_package hub://guardrails/llm_critic
+install_guardrails_hub_package hub://cartesia/mentions_drugs
+install_guardrails_hub_package hub://guardrails/politeness_check
+install_guardrails_hub_package hub://guardrails/reading_level
+install_guardrails_hub_package hub://guardrails/redundant_sentences
+install_guardrails_hub_package hub://guardrails/response_evaluator
+install_guardrails_hub_package hub://guardrails/sensitive_topics
+install_guardrails_hub_package hub://guardrails/two_words
+install_guardrails_hub_package hub://guardrails/uppercase
+install_guardrails_hub_package hub://guardrails/valid_choices
+install_guardrails_hub_package hub://guardrails/valid_length
+install_guardrails_hub_package hub://reflex/valid_python
+install_guardrails_hub_package hub://guardrails/valid_sql
+install_guardrails_hub_package hub://guardrails/web_sanitization
+install_guardrails_hub_package hub://guardrails/valid_url
+install_guardrails_hub_package hub://guardrails/valid_range
+install_guardrails_hub_package hub://guardrails/valid_open_api_spec
+install_guardrails_hub_package hub://guardrails/valid_json
+install_guardrails_hub_package hub://guardrails/valid_address
+install_guardrails_hub_package hub://guardrails/unusual_prompt
+install_guardrails_hub_package hub://numbersstation/sql_column_presence
+install_guardrails_hub_package hub://guardrails/responsiveness_check
+install_guardrails_hub_package hub://guardrails/regex_match
+install_guardrails_hub_package hub://guardrails/reading_time
+install_guardrails_hub_package hub://cartesia/quotes_price
+install_guardrails_hub_package hub://guardrails/one_line
+install_guardrails_hub_package hub://guardrails/lowercase
+install_guardrails_hub_package hub://guardrails/has_url
+install_guardrails_hub_package hub://guardrails/exclude_sql_predicates
+install_guardrails_hub_package hub://guardrails/endpoint_is_reachable
+install_guardrails_hub_package hub://guardrails/toxic_language
+install_guardrails_hub_package hub://guardrails/similar_to_document
+install_guardrails_hub_package hub://guardrails/saliency_check
+install_guardrails_hub_package hub://arize-ai/relevancy_evaluator
+install_guardrails_hub_package hub://guardrails/provenance_llm
+install_guardrails_hub_package hub://guardrails/profanity_free
+install_guardrails_hub_package hub://guardrails/logic_check
+install_guardrails_hub_package hub://guardrails/gibberish_text
+install_guardrails_hub_package hub://guardrails/extracted_summary_sentences_match
+install_guardrails_hub_package hub://guardrails/detect_pii
+install_guardrails_hub_package hub://guardrails/competitor_check
 
 # Update and install Nginx if not already installed
 if ! command -v nginx > /dev/null; then
