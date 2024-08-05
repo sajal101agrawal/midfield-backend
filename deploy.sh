@@ -10,6 +10,7 @@ GUNICORN_LOG="$APP_DIR/gunicorn.log"
 GUNICORN_ACCESS_LOG="$APP_DIR/gunicorn-access.log"
 NGINX_CONF="/etc/nginx/sites-available/midfield-backend"
 GUARDRAILS_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnb29nbGUtb2F1dGgyfDExNTM0Mzg0MzQxNTkzMTI3NDE5NCIsImFwaUtleUlkIjoiMzg4ZjljNmItODhlNC00NGNiLWE2MTgtN2EyZGNmYzg5NTAxIiwiaWF0IjoxNzIyNzg5NzI1LCJleHAiOjQ4NzYzODk3MjV9.qwHppDtqhOTRurS23e_1JYMNtD-v-Cdlx3Iv85-lEKQ"
+PROJECT_NAME="midfield"  # Change this to match your Django project name
 
 # Create app folder if it doesn't exist
 echo "Creating app folder"
@@ -74,74 +75,63 @@ send "$GUARDRAILS_API_KEY\r"
 expect eof
 EOF
 
-# Function to install Guardrails hub package if not already installed
-install_guardrails_hub_package() {
-    PACKAGE=$1
-    if ! guardrails hub list | grep -q "$PACKAGE"; then
-        echo "Installing $PACKAGE"
-        guardrails hub install $PACKAGE
-    else
-        echo "$PACKAGE is already installed"
-    fi
-}
-
-# Install Guardrails hub packages
-echo "Installing Guardrails hub packages"
-install_guardrails_hub_package hub://arize-ai/dataset_embeddings_guardrails
-install_guardrails_hub_package hub://scb-10x/correct_language
-install_guardrails_hub_package hub://guardrails/detect_prompt_injection
-install_guardrails_hub_package hub://aryn/extractive_summary
-install_guardrails_hub_package hub://guardrails/nsfw_text
-install_guardrails_hub_package hub://guardrails/provenance_embeddings
-install_guardrails_hub_package hub://guardrails/qa_relevance_llm_eval
-install_guardrails_hub_package hub://tryolabs/restricttotopic
-install_guardrails_hub_package hub://guardrails/secrets_present
-install_guardrails_hub_package hub://guardrails/similar_to_previous_values
-install_guardrails_hub_package hub://guardrails/wiki_provenance
-install_guardrails_hub_package hub://hyparam/csv_validator
-install_guardrails_hub_package hub://guardrails/ends_with
-install_guardrails_hub_package hub://cartesia/financial_tone
-install_guardrails_hub_package hub://guardrails/llm_critic
-install_guardrails_hub_package hub://cartesia/mentions_drugs
-install_guardrails_hub_package hub://guardrails/politeness_check
-install_guardrails_hub_package hub://guardrails/reading_level
-install_guardrails_hub_package hub://guardrails/redundant_sentences
-install_guardrails_hub_package hub://guardrails/response_evaluator
-install_guardrails_hub_package hub://guardrails/sensitive_topics
-install_guardrails_hub_package hub://guardrails/two_words
-install_guardrails_hub_package hub://guardrails/uppercase
-install_guardrails_hub_package hub://guardrails/valid_choices
-install_guardrails_hub_package hub://guardrails/valid_length
-install_guardrails_hub_package hub://reflex/valid_python
-install_guardrails_hub_package hub://guardrails/valid_sql
-install_guardrails_hub_package hub://guardrails/web_sanitization
-install_guardrails_hub_package hub://guardrails/valid_url
-install_guardrails_hub_package hub://guardrails/valid_range
-install_guardrails_hub_package hub://guardrails/valid_open_api_spec
-install_guardrails_hub_package hub://guardrails/valid_json
-install_guardrails_hub_package hub://guardrails/valid_address
-install_guardrails_hub_package hub://guardrails/unusual_prompt
-install_guardrails_hub_package hub://numbersstation/sql_column_presence
-install_guardrails_hub_package hub://guardrails/responsiveness_check
-install_guardrails_hub_package hub://guardrails/regex_match
-install_guardrails_hub_package hub://guardrails/reading_time
-install_guardrails_hub_package hub://cartesia/quotes_price
-install_guardrails_hub_package hub://guardrails/one_line
-install_guardrails_hub_package hub://guardrails/lowercase
-install_guardrails_hub_package hub://guardrails/has_url
-install_guardrails_hub_package hub://guardrails/exclude_sql_predicates
-install_guardrails_hub_package hub://guardrails/endpoint_is_reachable
-install_guardrails_hub_package hub://guardrails/toxic_language
-install_guardrails_hub_package hub://guardrails/similar_to_document
-install_guardrails_hub_package hub://guardrails/saliency_check
-install_guardrails_hub_package hub://arize-ai/relevancy_evaluator
-install_guardrails_hub_package hub://guardrails/provenance_llm
-install_guardrails_hub_package hub://guardrails/profanity_free
-install_guardrails_hub_package hub://guardrails/logic_check
-install_guardrails_hub_package hub://guardrails/gibberish_text
-install_guardrails_hub_package hub://guardrails/extracted_summary_sentences_match
-install_guardrails_hub_package hub://guardrails/detect_pii
-install_guardrails_hub_package hub://guardrails/competitor_check
+## Install Guardrails hub packages
+#echo "Installing Guardrails hub packages"
+#guardrails hub install hub://arize-ai/dataset_embeddings_guardrails || echo "Package already installed"
+#guardrails hub install hub://scb-10x/correct_language || echo "Package already installed"
+#guardrails hub install hub://guardrails/detect_prompt_injection || echo "Package already installed"
+#guardrails hub install hub://aryn/extractive_summary || echo "Package already installed"
+#guardrails hub install hub://guardrails/nsfw_text || echo "Package already installed"
+#guardrails hub install hub://guardrails/provenance_embeddings || echo "Package already installed"
+#guardrails hub install hub://guardrails/qa_relevance_llm_eval || echo "Package already installed"
+#guardrails hub install hub://tryolabs/restricttotopic || echo "Package already installed"
+#guardrails hub install hub://guardrails/secrets_present || echo "Package already installed"
+#guardrails hub install hub://guardrails/similar_to_previous_values || echo "Package already installed"
+#guardrails hub install hub://guardrails/wiki_provenance || echo "Package already installed"
+#guardrails hub install hub://hyparam/csv_validator || echo "Package already installed"
+#guardrails hub install hub://guardrails/ends_with || echo "Package already installed"
+#guardrails hub install hub://cartesia/financial_tone || echo "Package already installed"
+#guardrails hub install hub://guardrails/llm_critic || echo "Package already installed"
+#guardrails hub install hub://cartesia/mentions_drugs || echo "Package already installed"
+#guardrails hub install hub://guardrails/politeness_check || echo "Package already installed"
+#guardrails hub install hub://guardrails/reading_level || echo "Package already installed"
+#guardrails hub install hub://guardrails/redundant_sentences || echo "Package already installed"
+#guardrails hub install hub://guardrails/response_evaluator || echo "Package already installed"
+#guardrails hub install hub://guardrails/sensitive_topics || echo "Package already installed"
+#guardrails hub install hub://guardrails/two_words || echo "Package already installed"
+#guardrails hub install hub://guardrails/uppercase || echo "Package already installed"
+#guardrails hub install hub://guardrails/valid_choices || echo "Package already installed"
+#guardrails hub install hub://guardrails/valid_length || echo "Package already installed"
+#guardrails hub install hub://reflex/valid_python || echo "Package already installed"
+#guardrails hub install hub://guardrails/valid_sql || echo "Package already installed"
+#guardrails hub install hub://guardrails/web_sanitization || echo "Package already installed"
+#guardrails hub install hub://guardrails/valid_url || echo "Package already installed"
+#guardrails hub install hub://guardrails/valid_range || echo "Package already installed"
+#guardrails hub install hub://guardrails/valid_open_api_spec || echo "Package already installed"
+#guardrails hub install hub://guardrails/valid_json || echo "Package already installed"
+#guardrails hub install hub://guardrails/valid_address || echo "Package already installed"
+#guardrails hub install hub://guardrails/unusual_prompt || echo "Package already installed"
+#guardrails hub install hub://numbersstation/sql_column_presence || echo "Package already installed"
+#guardrails hub install hub://guardrails/responsiveness_check || echo "Package already installed"
+#guardrails hub install hub://guardrails/regex_match || echo "Package already installed"
+#guardrails hub install hub://guardrails/reading_time || echo "Package already installed"
+#guardrails hub install hub://cartesia/quotes_price || echo "Package already installed"
+#guardrails hub install hub://guardrails/one_line || echo "Package already installed"
+#guardrails hub install hub://guardrails/lowercase || echo "Package already installed"
+#guardrails hub install hub://guardrails/has_url || echo "Package already installed"
+#guardrails hub install hub://guardrails/exclude_sql_predicates || echo "Package already installed"
+#guardrails hub install hub://guardrails/endpoint_is_reachable || echo "Package already installed"
+#guardrails hub install hub://guardrails/toxic_language || echo "Package already installed"
+#guardrails hub install hub://guardrails/similar_to_document || echo "Package already installed"
+#guardrails hub install hub://guardrails/saliency_check || echo "Package already installed"
+#guardrails hub install hub://arize-ai/relevancy_evaluator || echo "Package already installed"
+#guardrails hub install hub://guardrails/provenance_llm || echo "Package already installed"
+#guardrails hub install hub://guardrails/profanity_free || echo "Package already installed"
+#guardrails hub install hub://guardrails/logic_check || echo "Package already installed"
+#guardrails hub install hub://guardrails/gibberish_text || echo "Package already installed"
+#guardrails hub install hub://guardrails/extracted_summary_sentences_match || echo "Package already installed"
+#guardrails hub install hub://guardrails/detect_pii || echo "Package already installed"
+#guardrails hub install hub://guardrails/competitor_check || echo "Package already installed"
 
 # Update and install Nginx if not already installed
 if ! command -v nginx > /dev/null; then
@@ -179,6 +169,12 @@ fi
 echo "Stopping any existing Gunicorn process"
 sudo pkill gunicorn || true
 
+# Ensure the socket file does not already exist
+if [ -e "$GUNICORN_SOCKET" ]; then
+    echo "Removing existing Gunicorn socket"
+    sudo rm "$GUNICORN_SOCKET"
+fi
+
 # Activate the virtual environment and start Gunicorn with the Django application
 echo "Starting Gunicorn"
 source $VENV_DIR/bin/activate
@@ -186,7 +182,7 @@ source $VENV_DIR/bin/activate
 # Export PYTHONPATH to ensure the project module is found
 export PYTHONPATH=$PYTHONPATH:$APP_DIR
 
-sudo $VENV_DIR/bin/gunicorn --workers 3 --bind unix:$GUNICORN_SOCKET midfield.wsgi:application --daemon --user www-data --group www-data --log-file $GUNICORN_LOG --access-logfile $GUNICORN_ACCESS_LOG
+sudo $VENV_DIR/bin/gunicorn --workers 3 --bind unix:$GUNICORN_SOCKET $PROJECT_NAME.wsgi:application --daemon --user www-data --group www-data --log-file $GUNICORN_LOG --access-logfile $GUNICORN_ACCESS_LOG
 
 # Set permissions
 echo "Setting permissions"
