@@ -108,7 +108,7 @@ def auth_receiver(request):
     request.session['refresh_token'] = refresh_token  # Store refresh token for future use
 
     # Optionally store tokens in the database
-    new_user = NewUser.objects.get(
+    new_user = NewUser.objects.filter(
         email = user_data['email'],
         google_id =  user_data['sub'],
     )
@@ -124,6 +124,7 @@ def auth_receiver(request):
             refresh_token = refresh_token
         )
     else :
+        new_user = new_user.first()
         new_user.authkey = id_token_str
         new_user.refresh_token = refresh_token
         new_user.save()
@@ -182,7 +183,7 @@ def refresh_auth_token(request):
         request.session['refresh_token'] = refresh_token  # Store refresh token for future use
 
         # Optionally store tokens in the database
-        new_user = NewUser.objects.get(
+        new_user = NewUser.objects.filter(
             email = user_data['email'],
             google_id =  user_data['sub'],
         )
@@ -198,6 +199,7 @@ def refresh_auth_token(request):
                 refresh_token = refresh_token
             )
         else :
+            new_user = new_user.first()
             new_user.authkey = new_auth_token
             new_user.refresh_token = refresh_token
             new_user.save()
