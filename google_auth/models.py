@@ -15,6 +15,7 @@ class NewUser(TimestampModel):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     authkey = models.TextField()
+    refresh_token = models.TextField()
     picture_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
