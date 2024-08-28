@@ -271,20 +271,21 @@ def refresh_auth_token(request):
         "user-data": user_data
     }, status=200)
     
-def sign_out(request):
-    session_keys = request.session.keys()
-    if 'user_data' in session_keys :
-        del request.session['user_data']
-        
-    if 'auth_key' in session_keys :
-        del request.session['auth_key']
-        
-    if 'refresh_token' in session_keys :
-        del request.session['refresh_token']
-        
-    return JsonResponse({
-        "data" : "successfully user has been signed out"
-    }, status=200)
+class sign_out(View):
+    def get(self, request):
+        session_keys = request.session.keys()
+        if 'user_data' in session_keys :
+            del request.session['user_data']
+            
+        if 'auth_key' in session_keys :
+            del request.session['auth_key']
+            
+        if 'refresh_token' in session_keys :
+            del request.session['refresh_token']
+            
+        return JsonResponse({
+            "data" : "successfully user has been signed out"
+        }, status=200)
 
 class dashboard(View):
     
