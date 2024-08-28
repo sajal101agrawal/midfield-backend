@@ -148,7 +148,7 @@ MIDDLEWARE += [
     "corsheaders.middleware.CorsMiddleware"
 ]
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React app URL
+    "http://localhost:5173",  # React app URL
 ]
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
