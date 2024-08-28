@@ -21,17 +21,12 @@ class create(View):
         if not user :
             return JsonResponse({'error': "No user found"}, status=400)
         
-        
         user = user.first()
-        
         if user_app.objects.filter(app_name = req_data['app_name'],user = user) :
             return JsonResponse({'error': "This app is already exists"}, status=400)
-            
         
         user_app.objects.create(app_name = req_data['app_name'],user = user)
-            
         return JsonResponse({'success': "The app is created successfully"}, status=201)
-    
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -55,7 +50,7 @@ class app_list(View):
         if not apps_objects:
             return JsonResponse({'error': "user doesnt have any apps created"}, status=400)
         
-        user_app_list = [ {"app_name" : i.app_name, "user_name" : i.user.name} for i in apps_objects]
+        user_app_list = [ {"app_name" : i.app_name, "user_name" : i.user.name, "api_key" : i.api_key} for i in apps_objects]
         return JsonResponse({'success': "The app is created successfully","app_lists" : user_app_list,'error': ''}, status=201)
     
 

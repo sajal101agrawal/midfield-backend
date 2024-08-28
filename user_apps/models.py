@@ -1,5 +1,5 @@
 from django.db import models
-import uuid, string, random
+import uuid, string, random, secrets
 from google_auth.models import TimestampModel
 from google_auth.models import NewUser
 # Create your models here.
@@ -17,4 +17,14 @@ class user_app(TimestampModel):
     app_name = models.CharField(max_length=255)
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
-    
+    api_key = models.TextField(editable=False, unique=True)  # Make api_key non-editable and unique
+
+    def save(self, *args, **kwargs):
+        if not self.api_key:
+            self.api_key = self.generate_api_key()
+        
+        super(user_app, self).save(*args, **kwargs)
+
+    @staticmethod
+    def generate_api_key():
+        return secrets.token_urlsafe(50)

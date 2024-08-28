@@ -273,8 +273,11 @@ def refresh_auth_token(request):
     
 def sign_out(request):
     del request.session['user_data']
-    return redirect('sign_in')
-
+    del request.session['auth_key'] 
+    del request.session['refresh_token'] 
+    return JsonResponse({
+        "data" : "successfully user has been signed out"
+    }, status=200)
 
 class dashboard(View):
     
