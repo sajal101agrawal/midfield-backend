@@ -7,5 +7,7 @@ urlpatterns = [
     path('auth-receiver/', views.auth_receiver, name='auth_receiver'),
     path('dashboard', views.dashboard.as_view(), name='dashboard'),
     path('getauthkey', views.getauthkey.as_view(), name='getauthkey'),
+    path('exchange-code/', views.exchange_code_for_token, name='exchange_code_for_token'),
+
 ]
 

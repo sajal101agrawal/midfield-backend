@@ -13,33 +13,87 @@ from user_apps.utils import get_apps_details
 from django.utils.crypto import get_random_string
 
 
-
-# @csrf_exempt
-# def sign_in(request,auth_code):
-#     google_auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
-#     params = {
-#         "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-#         "redirect_uri": request.build_absolute_uri('/auth-receiver/'),
-#         "response_type": "code",
-#         "scope": "openid email profile",
-#         "access_type": "offline",
-#         "prompt": "select_account"
-#     }
-#     return redirect(f"{google_auth_url}?{urlencode(params)}")
-
-
-@csrf_exempt
 def sign_in(request):
     google_auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
     params = {
         "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-        "redirect_uri": request.build_absolute_uri('/auth-receiver/'),
+        "redirect_uri": "http://localhost:3000/auth-receiver",  # Use this URI without trailing slash
         "response_type": "code",
         "scope": "openid email profile",
         "access_type": "offline",
         "prompt": "select_account"
     }
     return redirect(f"{google_auth_url}?{urlencode(params)}")
+
+@csrf_exempt
+def exchange_code_for_token(request):
+    """
+    This endpoint receives the code from the React frontend and exchanges it for tokens.
+    """
+    code = request.GET.get('code')
+    if not code:
+        return JsonResponse({"error": "Authorization code is missing"}, status=400)
+
+    token_url = "https://oauth2.googleapis.com/token"
+    data = {
+        "code": code,
+        "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+        "client_secret": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
+        "redirect_uri": "http://localhost:3000/auth-receiver",  # Must match exactly
+        "grant_type": "authorization_code",
+    }
+
+    try:
+        # Get tokens from Google
+        token_response = requests.post(token_url, data=data)
+        token_response.raise_for_status()  # Raise error for bad responses
+        token_response_data = token_response.json()
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"error": f"Failed to retrieve tokens: {str(e)}"}, status=400)
+
+    id_token_str = token_response_data.get('id_token')
+    refresh_token = token_response_data.get('refresh_token')
+
+    if not id_token_str:
+        return JsonResponse({"error": "ID token is missing"}, status=400)
+
+    # Verify the ID token
+    try:
+        user_data = id_token.verify_oauth2_token(
+            id_token_str, google_requests.Request(), settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+        )
+    except ValueError as e:
+        return JsonResponse({"error": f"Invalid ID token: {str(e)}"}, status=400)
+
+    # Save user data in the database
+    new_user, created = NewUser.objects.get_or_create(
+        google_id=user_data['sub'],
+        defaults={
+            'email': user_data['email'],
+            'name': user_data['name'],
+            'picture_url': user_data.get('picture', ''),
+            'authkey': id_token_str,
+            'refresh_token': refresh_token
+        }
+    )
+
+    # Update existing user
+    if not created:
+        new_user.authkey = id_token_str
+        new_user.refresh_token = refresh_token
+        new_user.save()
+
+    # Save user data in the session
+    request.session['user_data'] = user_data
+    request.session['auth_key'] = id_token_str
+    request.session['refresh_token'] = refresh_token
+
+    # Send back the data to the frontend
+    return JsonResponse({
+        "auth-token": id_token_str,
+        "refresh-token": refresh_token,
+        "user-data": user_data
+    }, status=200)
 
 @csrf_exempt
 def auth_receiver(request):
@@ -55,7 +109,7 @@ def auth_receiver(request):
         "code": code,
         "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
         "client_secret": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
-        "redirect_uri": request.build_absolute_uri('/auth-receiver/'),
+        "redirect_uri": request.build_absolute_uri('/exchange-code/'),
         "grant_type": "authorization_code",
     }
 
@@ -225,7 +279,11 @@ def sign_out(request):
 class dashboard(View):
     
     def get(self, request):
-        req_data= json.loads(request.body)
+        try:
+            req_data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': "Invalid JSON data"}, status=400)
+
         if not ("google_id" or "email" ) in req_data.keys() :
             return JsonResponse({'error': "there is not google id or email"}, status=400)
         
@@ -249,7 +307,11 @@ class dashboard(View):
 class getauthkey(View):
     
     def get(self, request):
-        req_data= json.loads(request.body)
+        try:
+            req_data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': "Invalid JSON data"}, status=400)
+
         if not ("google_id" or "email" ) in req_data.keys() :
             return JsonResponse({'error': "there is not google id or email"}, status=400)
         

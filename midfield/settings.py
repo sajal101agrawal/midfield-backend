@@ -139,14 +139,17 @@ INSTALLED_APPS += [
     "google_auth",
     "user_apps",
     "validators",
-    "prompts"
-    
-    
+    "prompts",
 ]
 
-# MIDDLEWARE += [
-#     "social_django.middleware.SocialAuthExceptionMiddleware"
-# ]
+
+
+MIDDLEWARE += [
+    "corsheaders.middleware.CorsMiddleware"
+]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React app URL
+]
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
