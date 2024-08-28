@@ -272,9 +272,16 @@ def refresh_auth_token(request):
     }, status=200)
     
 def sign_out(request):
-    del request.session['user_data']
-    del request.session['auth_key'] 
-    del request.session['refresh_token'] 
+    session_keys = request.session.keys()
+    if 'user_data' in session_keys :
+        del request.session['user_data']
+        
+    if 'auth_key' in session_keys :
+        del request.session['auth_key']
+        
+    if 'refresh_token' in session_keys :
+        del request.session['refresh_token']
+        
     return JsonResponse({
         "data" : "successfully user has been signed out"
     }, status=200)
@@ -326,4 +333,4 @@ class getauthkey(View):
         
         user= user.first()
         
-        return JsonResponse({'success': "successfully get the data","authkey" : user.authkey,'error': ''}, status=201)
+        return JsonResponse({'success': "successfully get the data","authkey" : user.authkey, "refresh_token" : user.refresh_token,'error': ''}, status=201)
