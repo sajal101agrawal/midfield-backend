@@ -15,7 +15,7 @@ class validators(TimestampModel):
     
     
 class Associated_validators(TimestampModel):
-    apikey = models.TextField(unique=True)
+    apikey = models.TextField()
     parameters = models.JSONField()
     validator = models.ForeignKey(validators, on_delete=models.CASCADE)
     user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
