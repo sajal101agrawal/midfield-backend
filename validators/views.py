@@ -1,4 +1,5 @@
 import json, inspect
+from re import L
 from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
@@ -20,6 +21,7 @@ class availablevalidators(View):
             data = [ 
                     {
                         "name" : i.name,
+                        "codename" : i.codename,
                         "descriptions" : i.descriptions,
                         "parameters" : i.parameters
                         }
@@ -67,7 +69,50 @@ class EditValidator(View):
         }
         
         return JsonResponse({'success': "successfully update the validator as the data below", "data" : data}, status=201)
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CreateAssociatedValidator(View):
+    @method_decorator(csrf_exempt)
+    def post(self, request):
+        req_data= json.loads(request.body)
+        req_keys = req_data.keys()
+        if not "apikey" in req_keys :
+            return JsonResponse({'error': "there is not apikey for the Associated validator"}, status=400)
         
+        user_app_obj = user_app.objects.filter(api_key=req_data['apikey'])
+        if not user_app_obj :
+            return JsonResponse({'error': "could not find the user app with apikey"}, status=400)
+        user_app_obj = user_app_obj.first()
+
+        validator_obj = validators.objects.filter(codename = req_data['validator_codename'])
+        if not validator_obj:
+            return JsonResponse({'error': "could not find the validator"}, status=400)
+        
+        associated_validator_obj = Associated_validators.objects.filter(apikey = req_data['apikey'],validator = validator_obj.first())
+        if associated_validator_obj :
+            return JsonResponse({'error': "already created the Associated validator with the given data"}, status=400)
+            
+        Associated_validators_obj = Associated_validators.objects.create(
+            apikey = req_data['apikey'],
+            parameters = req_data['parameters'],
+            validator = validator_obj.first(),
+            user = user_app_obj.user,
+            userapp = user_app_obj,
+        )
+        
+        data = {
+            "apikey" : Associated_validators_obj.apikey,
+            "parameters" : Associated_validators_obj.parameters,
+            "validator" : Associated_validators_obj.validator.name,
+            "userapp" : Associated_validators_obj.userapp.app_name,
+            "codename" : Associated_validators_obj.validator.codename
+        }
+        
+        return JsonResponse({'success': "successfully created the Associated validator as the data given", "data" : data}, status=201)
+        
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class EditAssociatedValidator(View):
@@ -93,8 +138,8 @@ class EditAssociatedValidator(View):
             "apikey" : validator_obj.apikey,
             "parameters" : validator_obj.parameters,
             "validator" : validator_obj.validator.name,
-            "user" : validator_obj.user.name,
             "userapp" : validator_obj.userapp.app_name,
+            "codename" : validator_obj.codename
         }
         
         return JsonResponse({'success': "successfully update the Associated validator as the data below", "data" : data}, status=201)
