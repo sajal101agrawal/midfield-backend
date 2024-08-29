@@ -81,36 +81,56 @@ class CreateAssociatedValidator(View):
         if not "apikey" in req_keys :
             return JsonResponse({'error': "there is not apikey for the Associated validator"}, status=400)
         
+        if not "validators" in req_keys :
+            return JsonResponse({'error': "there is not validator's list for the Associated validator creation"}, status=400)
+        elif type(req_data['validators']) != list :
+            return JsonResponse({'error': "validator must be in list types with contains json data of validators"}, status=400)
+            
         user_app_obj = user_app.objects.filter(api_key=req_data['apikey'])
         if not user_app_obj :
             return JsonResponse({'error': "could not find the user app with apikey"}, status=400)
         user_app_obj = user_app_obj.first()
-
-        validator_obj = validators.objects.filter(codename = req_data['validator_codename'])
-        if not validator_obj:
-            return JsonResponse({'error': "could not find the validator"}, status=400)
         
-        associated_validator_obj = Associated_validators.objects.filter(apikey = req_data['apikey'],validator = validator_obj.first())
-        if associated_validator_obj :
-            return JsonResponse({'error': "already created the Associated validator with the given data"}, status=400)
+        for validator in req_data['validators'] : 
+            if not "validator_codename" in validator.keys() :
+                continue
             
-        Associated_validators_obj = Associated_validators.objects.create(
-            apikey = req_data['apikey'],
-            parameters = req_data['parameters'],
-            validator = validator_obj.first(),
-            user = user_app_obj.user,
-            userapp = user_app_obj,
-        )
+            if not "parameters" in validator.keys() :
+                parameters = {}
+            else:
+                parameters = validator['parameters']
+                
+            validator_obj = validators.objects.filter(codename = validator['validator_codename'])
+            if not validator_obj:
+                validator['created'] = False
+                continue
+                # return JsonResponse({'error': "could not find the validator"}, status=400)
         
-        data = {
-            "apikey" : Associated_validators_obj.apikey,
-            "parameters" : Associated_validators_obj.parameters,
-            "validator" : Associated_validators_obj.validator.name,
-            "userapp" : Associated_validators_obj.userapp.app_name,
-            "codename" : Associated_validators_obj.validator.codename
-        }
+            associated_validator_obj = Associated_validators.objects.filter(apikey = req_data['apikey'],validator = validator_obj.first())
+            if associated_validator_obj :
+                validator['created'] = False
+                continue
+                # return JsonResponse({'error': "already created the Associated validator with the given data"}, status=400)
+            
+            Associated_validators_obj = Associated_validators.objects.create(
+                apikey = req_data['apikey'],
+                parameters = parameters,
+                validator = validator_obj.first(),
+                user = user_app_obj.user,
+                userapp = user_app_obj,
+            )
+
+            tmp_data = {
+                "apikey" : Associated_validators_obj.apikey,
+                "parameters" : Associated_validators_obj.parameters,
+                "validator" : Associated_validators_obj.validator.name,
+                "userapp" : Associated_validators_obj.userapp.app_name,
+                "codename" : Associated_validators_obj.validator.codename
+            }
+            validator['created'] = True
+            validator['data'] = tmp_data
         
-        return JsonResponse({'success': "successfully created the Associated validator as the data given", "data" : data}, status=201)
+        return JsonResponse({'success': "successfully created the Associated validator as the data given", "data" : req_data['validators']}, status=201)
         
 
 
@@ -208,7 +228,6 @@ class validate(View):
                     return JsonResponse({'error': f"Missing required parameter: {missing_param}"}, status=400)
                 
             try:
-                breakpoint()
                 result = function_to_call(**args_to_pass)
                 prompts.objects.create(
                     app = apps_object,
