@@ -7,7 +7,7 @@ from google_auth.models import TimestampModel
 class validators(TimestampModel):
     name = models.CharField(max_length=255, unique=True)
     descriptions = models.TextField()
-    parameters = models.JSONField()
+    parameters = models.JSONField(null=True,blank=True)
     codename = models.IntegerField(unique=True)
     
     def __str__(self) -> str:

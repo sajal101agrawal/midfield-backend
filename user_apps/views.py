@@ -29,7 +29,6 @@ class create(View):
         data = {
             "app_name" : user_app_obj.app_name,
             "unique_id" : user_app_obj.unique_id,
-            "user" : user_app_obj.user,
             "api_key" : user_app_obj.api_key
         }
         return JsonResponse({'success': "The app is created successfully", "data" : data}, status=201)
