@@ -172,7 +172,7 @@ class validate(View):
         
         req_data= json.loads(request.body)
         req_keys = req_data.keys()
-        if not "google_id" in req_keys or not "email" in req_keys or not "app_name" in req_keys or not "code_name" in req_keys :
+        if not "google_id" in req_keys or not "email" in req_keys or not "apikey" in req_keys or not "code_name" in req_keys :
             return JsonResponse({'error': "there is not google id or email or name of the app"}, status=400)
         
         user = NewUser.objects.filter(google_id = req_data['google_id'])
@@ -182,9 +182,9 @@ class validate(View):
                 return JsonResponse({'error': "No user found"}, status=400)
             
         user = user.first()
-        apps_objects = user_app.objects.filter(user = user,app_name = req_data['app_name'] ) 
+        apps_objects = user_app.objects.filter(user = user,api_key = req_data['apikey'] ) 
         if not apps_objects:
-            return JsonResponse({'error': f"user doesnt have apps created named : {req_data['app_name']}"}, status=400)
+            return JsonResponse({'error': f"user doesnt have apps created named : {req_data['apikey']}"}, status=400)
         apps_object = apps_objects.first()
         
         validator_objects = validators.objects.filter(codename=req_data["code_name"])
