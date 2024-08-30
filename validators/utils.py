@@ -13,6 +13,10 @@ from guardrails.hub import (
 )
 import random
 
+
+
+
+
 def match_regex(match_type = random.choice(["fullmatch","search"]), prompt : str = '', regex : str = '' ):
     """
     accept the prompt with parameters of regex in a string value
