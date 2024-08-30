@@ -243,15 +243,3 @@ class validate(View):
             
         except Exception as e:
             return JsonResponse({'error': f"Validation failed: {str(e)}"}, status=400)
-
-        
-        try:
-            
-            pass
-            return JsonResponse({'success': "The got all availablevalidators successfully", "data" : data}, status=201)
-        except Exception as e :
-            return JsonResponse({'error': f"Got an error : {e}", "data" : data}, status=400)
-
-#         return JsonResponse({'success': "The app is created successfully"}, status=201)
-        
-        

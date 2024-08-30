@@ -98,7 +98,7 @@ class app_list(View):
             return JsonResponse({'error': "user doesnt have any apps created"}, status=400)
         
         user_app_list = [ {"app_name" : i.app_name, "user_name" : i.user.name, "api_key" : i.api_key, "unique_id" : i.unique_id} for i in apps_objects]
-        return JsonResponse({'success': "The app is created successfully","app_lists" : user_app_list,'error': ''}, status=201)
+        return JsonResponse({'success': "get the list of all apps successfully","app_lists" : user_app_list,'error': ''}, status=201)
     
 
 
