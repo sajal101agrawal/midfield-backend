@@ -105,7 +105,7 @@ class validate(View):
             'provenance_embeddings': ProvenanceEmbeddings,
             'qa_relevance_llm_eval': QARelevanceLLMEval,
             'restrict_to_topic': RestrictToTopic,
-            'secrets_present': SecretsPresent,
+            'secrets_present': SecretsPresent, #
             'similar_to_previous_values': SimilarToPreviousValues,
             'wiki_provenance': WikiProvenance,
             'csv_match': CsvMatch,
@@ -129,7 +129,7 @@ class validate(View):
             'valid_range': ValidRange,
             'valid_openapi_spec': ValidOpenApiSpec,
             'valid_json': ValidJson,
-            'valid_address': ValidAddress,
+            'valid_address': ValidAddress, ## needs to check the lib and then add it
             'unusual_prompt': UnusualPrompt,
             'sql_column_presence': SqlColumnPresence,
             'responsiveness_check': ResponsivenessCheck,
@@ -163,7 +163,11 @@ class validate(View):
             if not validator_class:
                 return JsonResponse({'error': f'Unknown check type: {check_type}'}, status=status.HTTP_400_BAD_REQUEST)
             try:
-                validator_instance = validator_class(**parameters, on_fail=OnFailAction.EXCEPTION)
+                if parameters != {}:
+                    validator_instance = validator_class(**parameters, on_fail=OnFailAction.EXCEPTION)
+                else:
+                    validator_instance = validator_class(on_fail=OnFailAction.EXCEPTION)
+                    
                 validators_instances.append(validator_instance)
             except TypeError as e:
                 return JsonResponse({'error': f'Error initializing validator {check_type}: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)

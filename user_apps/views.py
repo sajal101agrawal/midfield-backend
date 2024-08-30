@@ -153,7 +153,7 @@ class update_app(View):
         user = user.first()
         apps_objects = user_app.objects.filter(user = user,app_name = req_data['app_name'] ) 
         if not apps_objects:
-            return JsonResponse({'error': f"user doesnt have apps created named : {req_data['app_name']}"}, status=400)
+            return JsonResponse({'error': f"app not found named : {req_data['app_name']}"}, status=400)
         apps_objects.delete()
         
-        return JsonResponse({'success': "The app is created successfully","app_lists" : user_app_list,'error': ''}, status=201)
+        return JsonResponse({'success': "The app is deleted successfully","app_lists" : user_app_list,'error': ''}, status=201)
