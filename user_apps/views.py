@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from google_auth.models import NewUser
 from .models import user_app
 from django.core import serializers
+from validators.models import validators, Associated_validators
 
 @method_decorator(csrf_exempt, name='dispatch')
 class create(View):
@@ -17,6 +18,9 @@ class create(View):
         if not ("google_id" and "email" and "app_name") in req_data.keys() :
             return JsonResponse({'error': "there is not google id or email or app's name"}, status=400)
         
+        if not "validators" in req_data.keys() :
+            return JsonResponse({'error': "not found validators's list"}, status=400)
+        
         user = NewUser.objects.filter(google_id = req_data['google_id'],email = req_data['email'])
         if not user :
             return JsonResponse({'error': "No user found"}, status=400)
@@ -26,10 +30,48 @@ class create(View):
             return JsonResponse({'error': "This app is already exists"}, status=400)
         
         user_app_obj = user_app.objects.create(app_name = req_data['app_name'],user = user)
+        
+        validators_list_data = []
+        for validator in req_data['validators'] : 
+            validator = {
+                "validator_codename" : validator,
+                "parameters" : {}
+               }
+            
+            validator_obj = validators.objects.filter(codename = validator['validator_codename'])
+            if not validator_obj:
+                validator['created'] = False
+                continue
+        
+            associated_validator_obj = Associated_validators.objects.filter(apikey = req_data['apikey'],validator = validator_obj.first())
+            if associated_validator_obj :
+                validator['created'] = False
+                continue
+            
+            Associated_validators_obj = Associated_validators.objects.create(
+                apikey = user_app_obj.api_key,
+                parameters = validator["parameters"],
+                validator = validator_obj.first(),
+                user = user_app_obj.user,
+                userapp = user_app_obj,
+            )
+
+            tmp_data = {
+                "apikey" : Associated_validators_obj.apikey,
+                "parameters" : Associated_validators_obj.parameters,
+                "validator" : Associated_validators_obj.validator.name,
+                "userapp" : Associated_validators_obj.userapp.app_name,
+                "codename" : Associated_validators_obj.validator.codename
+            }
+            validator['created'] = True
+            validator['data'] = tmp_data
+            validators_list_data.append(validator)
+        
         data = {
             "app_name" : user_app_obj.app_name,
             "unique_id" : user_app_obj.unique_id,
-            "api_key" : user_app_obj.api_key
+            "api_key" : user_app_obj.api_key,
+            "associated_validators" : validators_list_data
         }
         return JsonResponse({'success': "The app is created successfully", "data" : data}, status=201)
 

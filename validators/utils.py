@@ -11,8 +11,9 @@ from guardrails.hub import (
     ProvenanceLLM, LowerCase, LogicCheck,
     GibberishText, ExtractedSummarySentencesMatch, DetectPII
 )
+import random
 
-def match_regex(prompt : str = '', parameters : str = ''):
+def match_regex(match_type = random.choice(["fullmatch","search"]), prompt : str = '', regex : str = '' ):
     """
     accept the prompt with parameters of regex in a string value
     return False :
@@ -20,12 +21,18 @@ def match_regex(prompt : str = '', parameters : str = ''):
         cond 2 :if it is could not validate
     """
     
-    if not prompt or not parameters :
+    if not prompt :
         return False
     
+    if type(match_type) == list :
+        if len(match_type) < 1 :
+            match_type == "fullmatch"
+    print(match_type,prompt,'<<--------------------')
+    breakpoint()
     guard = Guard().use_many(
         RegexMatch(
-            regex=parameters
+            regex=regex,
+            match_type = match_type
         )
     )
 
