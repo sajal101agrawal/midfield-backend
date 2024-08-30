@@ -27,8 +27,6 @@ def match_regex(match_type = random.choice(["fullmatch","search"]), prompt : str
     if type(match_type) == list :
         if len(match_type) < 1 :
             match_type == "fullmatch"
-    print(match_type,prompt,'<<--------------------')
-    breakpoint()
     guard = Guard().use_many(
         RegexMatch(
             regex=regex,

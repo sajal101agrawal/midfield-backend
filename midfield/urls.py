@@ -24,6 +24,6 @@ urlpatterns = [
     path('', include('google_auth.urls')),
     path('api/app/', include('user_apps.urls')),
     path('api/validator/', include('validators.urls')),
-    path('api/prompts/', include('prompts.urls')),
+    path('api/prompt/', include('prompts.urls')),
 
 ]

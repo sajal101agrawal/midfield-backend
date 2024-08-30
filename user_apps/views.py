@@ -43,7 +43,7 @@ class create(View):
                 validator['created'] = False
                 continue
         
-            associated_validator_obj = Associated_validators.objects.filter(apikey = req_data['apikey'],validator = validator_obj.first())
+            associated_validator_obj = Associated_validators.objects.filter(apikey = user_app_obj.api_key,validator = validator_obj.first())
             if associated_validator_obj :
                 validator['created'] = False
                 continue
