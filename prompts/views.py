@@ -38,9 +38,10 @@ class GetAllPrompts(View):
         
         
         
-
+@method_decorator(csrf_exempt, name='dispatch')
 class validate(View):
-    def get(self, request):
+    @method_decorator(csrf_exempt)
+    def post(self, request):
         
         req_data= json.loads(request.body)
         req_keys = req_data.keys()
