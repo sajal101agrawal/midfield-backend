@@ -17,7 +17,7 @@ def sign_in(request):
     google_auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
     params = {
         "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-        "redirect_uri": "http://localhost:5173/auth-receiver",  # Use this URI without trailing slash
+        "redirect_uri": "https://midfield.ai/auth-receiver",  # Use this URI without trailing slash
         "response_type": "code",
         "scope": "openid email profile",
         "access_type": "offline",
@@ -39,7 +39,7 @@ def exchange_code_for_token(request):
         "code": code,
         "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
         "client_secret": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
-        "redirect_uri": "hthttp://localhost:5173/auth-receiver",  # Must match exactly
+        "redirect_uri": "https://midfield.ai/auth-receiver",  # Must match exactly
         "grant_type": "authorization_code",
     }
 
