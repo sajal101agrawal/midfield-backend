@@ -178,7 +178,7 @@ class validate(View):
             prompts.objects.create(
                 app = user_app_obj,
                 user = user_obj,
-                validate = result,
+                validate = result.validation_passed,
                 prompt = prompt
             )
         except Exception as e:

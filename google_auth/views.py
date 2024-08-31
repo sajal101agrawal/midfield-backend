@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 from midfield import settings
 from django.views import View
 from user_apps.models import user_app
-from user_apps.utils import get_apps_details
+from user_apps.utils import get_apps_details, get_apps_details_analytics
 from django.utils.crypto import get_random_string
 
 
@@ -17,7 +17,7 @@ def sign_in(request):
     google_auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
     params = {
         "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-        "redirect_uri": "https://midfield.ai/auth-receiver",  # Use this URI without trailing slash
+        "redirect_uri": "http://midfield.ai/dashboard",  # Use this URI without trailing slash
         "response_type": "code",
         "scope": "openid email profile",
         "access_type": "offline",
@@ -39,7 +39,7 @@ def exchange_code_for_token(request):
         "code": code,
         "client_id": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
         "client_secret": settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
-        "redirect_uri": "https://midfield.ai/auth-receiver",  # Must match exactly
+        "redirect_uri": "http://midfield.ai/dashboard",  # Must match exactly
         "grant_type": "authorization_code",
     }
 
@@ -312,6 +312,34 @@ class dashboard(View):
             "name" : user.name,
             "profile_url" : user.picture_url,
             "app_details" : get_apps_details(user)
+        }
+        return JsonResponse({'success': "successfully get the data","data" : data,'error': ''}, status=201)
+    
+class dashboard_analytics(View):
+    
+    def get(self, request):
+        try:
+            req_data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': "Invalid JSON data"}, status=400)
+
+        if not ("google_id" or "email" ) in req_data.keys() :
+            return JsonResponse({'error': "there is not google id or email"}, status=400)
+        
+        user = NewUser.objects.filter(google_id = req_data['google_id'])
+        if not user :
+            user =  NewUser.objects.filter(email = req_data['email']) 
+            if not user:
+                return JsonResponse({'error': "No user found"}, status=400)
+        
+        user= user.first()
+        
+        data = {
+            "google_id" : user.google_id,
+            "email" : user.email,
+            "name" : user.name,
+            "profile_url" : user.picture_url,
+            "app_details" : get_apps_details_analytics(user)
         }
         return JsonResponse({'success': "successfully get the data","data" : data,'error': ''}, status=201)
 
