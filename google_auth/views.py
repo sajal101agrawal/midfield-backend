@@ -81,7 +81,7 @@ def exchange_code_for_token(request):
     # Update existing user
     if not created:
         new_user.authkey = id_token_str
-        new_user.refresh_token = refresh_token
+        if refresh_token :new_user.refresh_token = refresh_token
         new_user.save()
 
     # Save user data in the session
