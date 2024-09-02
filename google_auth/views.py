@@ -11,7 +11,8 @@ from django.views import View
 from user_apps.models import user_app
 from user_apps.utils import get_apps_details, get_apps_details_analytics
 from django.utils.crypto import get_random_string
-
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 def sign_in(request):
     google_auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
@@ -287,9 +288,10 @@ class sign_out(View):
             "data" : "successfully user has been signed out"
         }, status=200)
 
+@method_decorator(csrf_exempt, name='dispatch')
 class dashboard(View):
-    
-    def get(self, request):
+    @method_decorator(csrf_exempt)
+    def post(self, request):
         try:
             req_data = json.loads(request.body)
         except json.JSONDecodeError:
@@ -315,9 +317,10 @@ class dashboard(View):
         }
         return JsonResponse({'success': "successfully get the data","data" : data,'error': ''}, status=201)
     
+@method_decorator(csrf_exempt, name='dispatch')
 class dashboard_analytics(View):
-    
-    def get(self, request):
+    @method_decorator(csrf_exempt)
+    def post(self, request):
         try:
             req_data = json.loads(request.body)
         except json.JSONDecodeError:
