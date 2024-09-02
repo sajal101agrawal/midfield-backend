@@ -133,9 +133,12 @@ class update_app(View):
         apps_object.save()
         
         return JsonResponse({'success': "The app is updated successfully",'error': ''}, status=201)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class delete_app(View):
     
     @method_decorator(csrf_exempt)
-    def delete(self, request):
+    def post(self, request):
         """to delete the app of user"""
 
         user_app_list = []
