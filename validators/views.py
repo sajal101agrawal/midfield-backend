@@ -166,6 +166,24 @@ class EditAssociatedValidator(View):
         
 
 @method_decorator(csrf_exempt, name='dispatch')
+class DeleteAssociatedValidator(View):
+    @method_decorator(csrf_exempt)
+    def post(self, request):
+        req_data= json.loads(request.body)
+        req_keys = req_data.keys()
+        if not "apikey" in req_keys :
+            return JsonResponse({'error': "there is not apikey for the Associated validator"}, status=400)
+        
+        validator_obj = Associated_validators.objects.filter(apikey = req_data['apikey'])
+        if not validator_obj :
+            return JsonResponse({'error': "could not find the Associated validator"}, status=400)
+            
+        validator_obj = validator_obj.first().delete()
+        
+        return JsonResponse({'success': "successfully delete the Associated validator as the data below"}, status=200)
+        
+
+@method_decorator(csrf_exempt, name='dispatch')
 class validate(View):
     @method_decorator(csrf_exempt)
     def post(self, request):

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import availablevalidators, validate, EditValidator, EditAssociatedValidator, CreateAssociatedValidator
+from .views import availablevalidators, validate, EditValidator, EditAssociatedValidator, CreateAssociatedValidator, DeleteAssociatedValidator
 
 urlpatterns = [
     path('getlistofavailablevalidators/', availablevalidators.as_view(), name='availablevalidators'),
@@ -7,5 +7,6 @@ urlpatterns = [
     path('createassociatedvalidate/', CreateAssociatedValidator.as_view(), name='createvalidate'),
     path('editvalidate/', EditValidator.as_view(), name='editvalidate'),
     path('editassociatedvalidate/', EditAssociatedValidator.as_view(), name='editassociatedvalidate'),
+    path('deleteassociatedvalidate/', DeleteAssociatedValidator.as_view(), name='deleteassociatedvalidate'),
 ]
 
