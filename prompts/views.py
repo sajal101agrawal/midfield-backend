@@ -11,27 +11,7 @@ from user_apps.models import user_app
 from prompts.models import prompts
 from validators.models import validators, Associated_validators
 from guardrails import Guard, OnFailAction
-from guardrails.hub import (
-    RegexMatch, ToxicLanguage, MentionsDrugs,
-    CompetitorCheck, ValidLength, ValidURL,
-    ValidJson, ValidPython, ValidSQL,
-    WebSanitization, ValidAddress, UnusualPrompt,
-    SqlColumnPresence, ResponsivenessCheck, ReadingTime,
-    QuotesPrice, OneLine, LowerCase,
-    HasUrl, ExcludeSqlPredicates, EndpointIsReachable,
-    SimilarToDocument, SaliencyCheck, RelevancyEvaluator,
-    ProvenanceLLM, LowerCase, LogicCheck,
-    GibberishText, ExtractedSummarySentencesMatch, DetectPII,
-    ArizeDatasetEmbeddings, CorrectLanguage, 
-    DetectPromptInjection, ExtractiveSummary, NSFWText,
-    ProvenanceEmbeddings, QARelevanceLLMEval, RestrictToTopic,
-    SecretsPresent, SimilarToPreviousValues, WikiProvenance,
-    CsvMatch, EndsWith, FinancialTone,
-    LLMCritic, PolitenessCheck, ReadingLevel,
-    RedundantSentences, ResponseEvaluator, SensitiveTopic,
-    TwoWords,
-    UpperCase, ValidChoices, ValidRange,
-    ValidOpenApiSpec, ProfanityFree )
+from .utils import VALIDATORS
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GetAllPrompts(View):
@@ -63,127 +43,98 @@ class GetAllPrompts(View):
 class validate(View):
     @method_decorator(csrf_exempt)
     def post(self, request):
-        req_data= json.loads(request.body)
+        try:
+            req_data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+
+        # Validate API key and prompt presence
+        apikey = req_data.get('apikey')
+        prompt = req_data.get('prompt')
+        argument = req_data.get('args', {})
+        required_args = req_data.get('required_args', [])  # List of required arguments for validation
+        arg_name = req_data.get('arg_name', 'metadata')  # Dynamic argument name, default to 'metadata'
+
+        if not apikey:
+            return JsonResponse({'error': 'API KEY is required'}, status=400)
         
-        if not "apikey"  in req_data.keys():
-            return JsonResponse({'error': 'API KEY is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not prompt:
+            return JsonResponse({'error': 'Prompt is required'}, status=400)
 
-        if not "prompt"  in req_data.keys():
-            return JsonResponse({'error': 'Prompt is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        apikey = req_data['apikey']
-        prompt = req_data['prompt']
-
-        user_app_obj = user_app.objects.filter(api_key= apikey)
-        if not user_app_obj :
-            return JsonResponse({'error': "invalid api key"}, status=400)
-        user_app_obj = user_app_obj.first()
+        # Validate API key against the database
+        user_app_obj = user_app.objects.filter(api_key=apikey).first()
+        if not user_app_obj:
+            return JsonResponse({'error': "Invalid API key"}, status=400)
+        
         user_obj = user_app_obj.user
-        
-        asoociated_val_objects = Associated_validators.objects.filter(userapp=user_app_obj)
-        if not asoociated_val_objects:
-            return JsonResponse({'error': f"user does not have any asoociated validator created"}, status=400)
 
+        # Fetch associated validators
+        associated_val_objects = Associated_validators.objects.filter(userapp=user_app_obj)
+        if not associated_val_objects:
+            return JsonResponse({'error': "User does not have any associated validators created"}, status=400)
+
+        # Prepare checks for validators
         checks = []
-        
-        for val in asoociated_val_objects :
-            
-            validator_objects = val.validator
-            tmp = {}
-            tmp['type'] = validator_objects.name
-            if validator_objects.parameters :
-                tmp['parameters'] = validator_objects.parameters
+        for val in associated_val_objects:
+            validator_object = val.validator
+            tmp = {'type': validator_object.name}
+            if validator_object.parameters:
+                tmp['parameters'] = validator_object.parameters
+                # Update parameters based on provided arguments
+                for key, val in tmp['parameters'].items():
+                    if key in argument:
+                        tmp['parameters'][key] = argument[key]
             checks.append(tmp)
 
-        # Map of check types to validator classes
-        validators = {
-            'arize_dataset_embeddings': ArizeDatasetEmbeddings,
-            'correct_language': CorrectLanguage,
-            'detect_prompt_injection': DetectPromptInjection,
-            'extractive_summary': ExtractiveSummary,
-            'nsfw_text': NSFWText,
-            'provenance_embeddings': ProvenanceEmbeddings,
-            'qa_relevance_llm_eval': QARelevanceLLMEval,
-            'restrict_to_topic': RestrictToTopic,
-            'secrets_present': SecretsPresent, #
-            'similar_to_previous_values': SimilarToPreviousValues,
-            'wiki_provenance': WikiProvenance,
-            'csv_match': CsvMatch,
-            'ends_with': EndsWith,
-            'financial_tone': FinancialTone,
-            'llm_critic': LLMCritic,
-            'mentions_drugs': MentionsDrugs,
-            'politeness_check': PolitenessCheck,
-            'reading_level': ReadingLevel,
-            'redundant_sentences': RedundantSentences,
-            'response_evaluator': ResponseEvaluator,
-            'sensitive_topic': SensitiveTopic,
-            'two_words': TwoWords,
-            'upper_case': UpperCase,
-            'valid_choices': ValidChoices,
-            'valid_length': ValidLength,
-            'valid_python': ValidPython,
-            'valid_sql': ValidSQL,
-            'web_sanitization': WebSanitization,
-            'valid_url': ValidURL,
-            'valid_range': ValidRange,
-            'valid_openapi_spec': ValidOpenApiSpec,
-            'valid_json': ValidJson,
-            'valid_address': ValidAddress, ## needs to check the lib and then add it
-            'unusual_prompt': UnusualPrompt,
-            'sql_column_presence': SqlColumnPresence,
-            'responsiveness_check': ResponsivenessCheck,
-            'regex_match': RegexMatch,
-            'reading_time': ReadingTime,
-            'quotes_price': QuotesPrice,
-            'one_line': OneLine,
-            'lower_case': LowerCase,
-            'has_url': HasUrl,
-            'exclude_sql_predicates': ExcludeSqlPredicates,
-            'endpoint_is_reachable': EndpointIsReachable,
-            'toxic_language': ToxicLanguage,
-            'similar_to_document': SimilarToDocument,
-            'saliency_check': SaliencyCheck,
-            'relevancy_evaluator': RelevancyEvaluator,
-            'provenance_llm': ProvenanceLLM,
-            'profanity_free': ProfanityFree,
-            'logic_check': LogicCheck,
-            'gibberish_text': GibberishText,
-            'extracted_summary_sentences_match': ExtractedSummarySentencesMatch,
-            'detect_pii': DetectPII,
-            'competitor_check': CompetitorCheck,
-        }
-
+        # Initialize validator instances
         validators_instances = []
 
         for check in checks:
             check_type = check.get('type')
             parameters = check.get('parameters', {})
-            validator_class = validators.get(check_type)
+            validator_class = VALIDATORS.get(check_type)
+
             if not validator_class:
-                return JsonResponse({'error': f'Unknown check type: {check_type}'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': f'Unknown check type: {check_type}'}, status=400)
+
+            # Create validator instance
             try:
-                if parameters != {}:
+                if parameters:
                     validator_instance = validator_class(**parameters, on_fail=OnFailAction.EXCEPTION)
                 else:
                     validator_instance = validator_class(on_fail=OnFailAction.EXCEPTION)
-                    
+                
                 validators_instances.append(validator_instance)
             except TypeError as e:
-                return JsonResponse({'error': f'Error initializing validator {check_type}: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
-        guard = Guard().use_many(*validators_instances)
+                return JsonResponse({'error': f'Error initializing validator {check_type}: {str(e)}'}, status=400)
 
+        # Initialize Guard with validators
+        guard = Guard().use_many(*validators_instances)
+        breakpoint()
+
+        # Construct dynamic argument dictionary based on required arguments
+        dynamic_args = {}
+        for arg in required_args :
+            if arg in argument :
+                dynamic_args[arg] = argument[arg]
+        
+        # Prepare the dynamic argument dictionary for guard.validate()
+        dynamic_kwargs = {arg_name: dynamic_args} if dynamic_args else {}
+        
+        # Validate the prompt using Guard
         try:
-            result = guard.validate(prompt)
+            result = guard.validate(prompt, **dynamic_kwargs)
+            # Save validation result to the database
             prompts.objects.create(
-                app = user_app_obj,
-                user = user_obj,
-                validate = result.validation_passed,
-                prompt = prompt
+                app=user_app_obj,
+                user=user_obj,
+                validate=result.validation_passed,
+                prompt=prompt
             )
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return JsonResponse({'message': 'Prompt validated successfully!',"result" : result.validation_passed }, status=status.HTTP_200_OK)
+            return JsonResponse({'error': str(e)}, status=400)
+
+        return JsonResponse({'message': 'Prompt validated successfully!', "result": result.validation_passed}, status=200)
         
         
 # @method_decorator(csrf_exempt, name='dispatch')
